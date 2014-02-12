@@ -1,11 +1,3 @@
-//
-//  UINavigationController+Animations.h
-//  OrderProduct
-//
-//  Created by admin on 23.01.14.
-//  Copyright (c) 2014 flatstack. All rights reserved.
-//
-
 #import <UIKit/UIKit.h>
 
 @interface UINavigationController (PushAnimations)

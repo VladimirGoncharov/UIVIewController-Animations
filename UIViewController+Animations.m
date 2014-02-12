@@ -1,34 +1,38 @@
-//
-//  UINavigationController+Animations.m
-//  OrderProduct
-//
-//  Created by admin on 23.01.14.
-//  Copyright (c) 2014 flatstack. All rights reserved.
-//
-
 #import "UIViewController+Animations.h"
 
-static inline void perfomTransition(UIView *view,
-                                    CATransition *transition,
-                                    void(^action)())
+CG_INLINE void perfomTransition(UIView *view,
+                                CATransition *transition,
+                                void(^action)())
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    void (^blockAction)() =
+    ^{
         [view.layer addAnimation:transition forKey:nil];
         
         if (action)
             action();
-    });
+    };
+    
+    if ([NSThread isMainThread])
+    {
+        blockAction();
+    }
+    else
+    {
+        dispatch_sync(dispatch_get_main_queue(), blockAction);
+    }
 }
 
-static inline void perfomAnimation(UIView *view,
-                                   UIViewAnimationTransition animationTransition,
-                                   UIViewAnimationCurve animationCurve,
-                                   NSTimeInterval duration,
-                                   void(^action)())
+CG_INLINE void perfomAnimation(UIView *view,
+                               UIViewAnimationTransition animationTransition,
+                               UIViewAnimationCurve animationCurve,
+                               NSTimeInterval duration,
+                               void(^action)())
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    void (^blockAction)() =
+    ^{
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:duration];
+        [UIView setAnimationCurve:animationCurve];
         [UIView setAnimationTransition:animationTransition
                                forView:view
                                  cache:NO];
@@ -36,7 +40,16 @@ static inline void perfomAnimation(UIView *view,
             action();
         
         [UIView commitAnimations];
-    });
+    };
+    
+    if ([NSThread isMainThread])
+    {
+        blockAction();
+    }
+    else
+    {
+        dispatch_sync(dispatch_get_main_queue(), blockAction);
+    }
 }
 
 @implementation UINavigationController (Animations)
